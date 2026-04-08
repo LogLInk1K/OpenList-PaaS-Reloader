@@ -1,11 +1,10 @@
-# OpenList PaaS Deployer
+# OpenList-PaaS-Reloader
 
-本项目为 PaaS 平台设计，由于这类平台采用非持久化文件系统，在无远程数据库且不使用保活工具的情况下，配置随容器重启极易丢失。通过 Dockerfile 自动化脚本，本项目可实现在每次启动时从环境变量自动注入配置，解决 OpenList 在休眠唤醒后的存储丢失问题。
+本项目专为 Hugging Face 及 Render 等 PaaS 平台设计。由于此类平台采用非持久化文件系统，在无远程数据库且不使用保活工具时，容器重启或休眠唤醒会导致文件系统重置，从而丢失 OpenList 的存储配置。本项目通过 Dockerfile 里的脚本实现启动时自动从环境变量注入配置，实现“伪持久化”运行。
 
-## 核心原理
-- **无感知复活**：容器启动时，脚本自动读取 STORAGE_JSON_* 环境变量。
-- **API注入**：利用 OpenList 内部 API 自动完成管理员登录及存储挂载。
-- **开箱即用**：支持 Public Space 部署，敏感网盘配置通过 Secrets 隔离，兼顾 WebDAV 连通性与隐私安全。
+## 脚本原理
+
+脚本在 OpenList 后台启动后，首先轮询本地接口确保服务就绪，读取环境变量中的密码进行登录并获取 Token，随后循环遍历 STORAGE_JSON_* 变量，通过 API 接口将存储配置动态注入，实现配置自动重载。
 
 ## 快速上手
 
@@ -34,6 +33,6 @@ app_port: 5244
 
 ## 说明
 
-- 方案首发于博客 ![一些有关 OpenList 与 Hugging Face 的小巧思](https://log.1k.ink/p/openlist-huggingface) ，如有疑惑，可先前往博客文章中查看详细教程
+- 方案首发于博客 [一些有关 OpenList 与 Hugging Face 的小巧思](https://log.1k.ink/p/openlist-huggingface) ，如有疑惑，可先前往博客文章中查看详细教程
 - 本项目为“抛砖引玉”的自动化方案，适用于低频维护场景
 - 若需更高频的数据修改，以及真正的持久化数据，建议配合远程数据库（MySQL/PostgreSQL）使用
