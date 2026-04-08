@@ -1,11 +1,11 @@
-FROM openlistteam/openlist:latest
+FROM openlistteam/openlist:latest-lite
 WORKDIR /opt/openlist
 USER root
 EXPOSE 5244
 
 CMD sh -c "\
     ./openlist server & PID=\$!; \
-    \
+    sleep 5; \
     echo '⏳ 正在启动服务...'; \
     i=0; while ! wget -q --spider http://127.0.0.1:5244/api/public/settings; do \
         sleep 2; i=\$((i+1)); \
